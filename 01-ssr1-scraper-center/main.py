@@ -38,6 +38,46 @@ def parse_index(html):
         yield detail_url
 
 
+def scrape_detail(url):
+    return scrape_page(url)
+
+
+def parse_detail(html):
+    cover_pattern = re.compile(
+        'class="item.*?<img.*?src="(.*?)".*?class="cover">', re.S
+    )
+    name_pattern = re.compile('<h2.*?>(.*?)</h2>')
+    categories_pattern = re.compile(
+        '<button.*?category.*?<highlight-tag.*?>(.*?)</highlight-tag>', re.S
+    )
+    published_at_pattern = re.compile('(\d{4}-\d{2})\s?上映')
+    drama_pattern = re.compile('<div.*?drama.*?>.*?<p.*?>(.*?)</p>', re.S)
+    score_pattern = re.compile('<p.*?.score.*?>(.*?)</p>', re.S)
+
+    cover = re.search(cover_pattern, html).group(1).strip(
+    ) if re.search(cover_pattern, html) else None
+    name = re.search(name_pattern, html).group(1).strip(
+    ) if re.search(name_pattern, html) else None
+    categories = re.findall(categories_pattern,
+                            html) if re.findall(categories_pattern,
+                                                html) else []
+    published_at = (re.search(published_at_pattern, html).group(1)
+                    ) if re.search(published_at_pattern, html) else None
+    drama = re.search(drama_pattern, html).group(1).strip(
+    ) if re.search(drama_pattern, html) else None
+    score = float(re.search(score_pattern, html).group(1).strip()
+                  ) if re.search(score_pattern, html) else None
+
+    return {
+        'cover': cover,
+        'name': name,
+        'categories': categories,    # bug
+        'published_at': published_at,    # bug
+        'drama': drama,
+        'score': score,
+    }
+
+
 BASE_URL = 'https://ssr1.scrape.center'
 TOTAL_PAGE = 10
 
@@ -46,7 +86,11 @@ def main():
     for page in range(1, TOTAL_PAGE + 1):
         index_html = scrape_index(page)
         detail_urls = parse_index(index_html)
-        logging.info('detail urls %s', list(detail_urls))
+        # logging.info('detail urls %s', list(detail_urls))
+        for detail_url in detail_urls:
+            detail_html = scrape_detail(detail_url)
+            data = parse_detail(detail_html)
+            logging.info('get detail data %s', data)
 
 
 if __name__ == '__main__':
