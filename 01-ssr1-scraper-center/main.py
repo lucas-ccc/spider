@@ -39,7 +39,7 @@ def parse_index(html):
 
 
 BASE_URL = 'https://ssr1.scrape.center'
-TOTAL_PAGE = 11
+TOTAL_PAGE = 10
 
 
 def main():
