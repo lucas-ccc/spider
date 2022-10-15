@@ -1,6 +1,9 @@
 import requests
 import logging
 import re
+import json
+from os import makedirs
+from os.path import exists
 from urllib.parse import urljoin
 
 logging.basicConfig(
@@ -79,8 +82,21 @@ def parse_detail(html):
     }
 
 
+def save_data(data):
+    name = data.get('name')
+    data_path = f'{RESULT_DIR}/{name}.json'
+    json.dump(
+        data,
+        open(data_path, 'w', encoding='utf-8'),
+        ensure_ascii=False,
+        indent=2
+    )
+
+
 BASE_URL = 'https://ssr1.scrape.center'
 TOTAL_PAGE = 10
+RESULT_DIR = 'results'
+exists(RESULT_DIR) or makedirs(RESULT_DIR)
 
 
 def main():
@@ -92,6 +108,9 @@ def main():
             detail_html = scrape_detail(detail_url)
             data = parse_detail(detail_html)
             logging.info('get detail data %s', data)
+            logging.info('saving data to json file')
+            save_data(data)
+            logging.info('data saved successfully')
 
 
 if __name__ == '__main__':
