@@ -59,8 +59,9 @@ def parse_detail(html):
 
     cover = re.search(cover_pattern, html).group(1).strip(
     ) if re.search(cover_pattern, html) else None
+    # 将 英文 : 替换为 中文 ：，避免文件命名出错
     name = re.search(name_pattern, html).group(1).strip(
-    ) if re.search(name_pattern, html) else None
+    ).replace(': ', '：') if re.search(name_pattern, html) else None
     categories = re.findall(categories_pattern,
                             html) if re.findall(categories_pattern,
                                                 html) else []
@@ -96,6 +97,7 @@ def save_data(data):
 BASE_URL = 'https://ssr1.scrape.center'
 TOTAL_PAGE = 10
 RESULT_DIR = 'results'
+# 利用 or 的短路特性，存在目录则 or 后代码不执行，不存在，则创建
 exists(RESULT_DIR) or makedirs(RESULT_DIR)
 
 
