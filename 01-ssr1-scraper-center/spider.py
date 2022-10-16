@@ -17,6 +17,14 @@ logging.basicConfig(
 
 
 def scrape_page(url):
+    """通过传入的 url，爬取对应的 html 并返回
+
+    Arguments:
+        url {str} -- page url
+
+    Returns:
+        str -- html of page
+    """
     logging.info('scraping %s...', url)
     try:
         response = requests.get(url)
@@ -31,11 +39,27 @@ def scrape_page(url):
 
 
 def scrape_index(page):
+    """爬取对应 page 的 html 并返回
+
+    Arguments:
+        page {str} -- page of index page
+
+    Returns:
+        sts -- html of index page
+    """
     index_url = f'{BASE_URL}/page/{page}'
     return scrape_page(index_url)
 
 
 def parse_index(html):
+    """解析 scrape_index(page) 返回的 html，返回每部电影对应的详情页 url
+
+    Arguments:
+        html {str} -- page 对应网页的 html 文本
+
+    Yields:
+        generator -- 当前页面所有电影详情页 url 的迭代器
+    """
     pattern = re.compile('<a.*?href="(.*?)".*?class="name">')
     items = re.findall(pattern, html)
     if not items:
@@ -47,10 +71,26 @@ def parse_index(html):
 
 
 def scrape_detail(url):
+    """爬取详情页
+
+    Arguments:
+        url {str} -- 详情页 url
+
+    Returns:
+        function -- 爬取页面函数
+    """
     return scrape_page(url)
 
 
 def parse_detail(html):
+    """解析详情页的 html，以 字典 形式返回需要爬取的信息
+
+    Arguments:
+        html {str} -- 详情页 html 文本
+
+    Returns:
+        dict -- 需要爬取的信息
+    """
     cover_pattern = re.compile(
         'class="item.*?<img.*?src="(.*?)".*?class="cover">', re.S
     )
@@ -89,6 +129,11 @@ def parse_detail(html):
 
 
 def save_data(data):
+    """将爬取的 data 保存到文件内
+
+    Arguments:
+        data {dict} -- 爬取的数据
+    """
     name = data.get('name')
     data_path = f'{RESULT_DIR}/{name}.json'
     json.dump(
