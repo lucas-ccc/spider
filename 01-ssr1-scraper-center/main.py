@@ -1,3 +1,4 @@
+import multiprocessing
 import requests
 import logging
 import re
@@ -7,7 +8,11 @@ from os.path import exists
 from urllib.parse import urljoin
 
 logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s'
+    level=logging.INFO,
+    filename='spider.log',
+    filemode='a',
+    encoding='utf-8',
+    format='%(asctime)s - %(levelname)s: %(message)s'
 )
 
 
@@ -101,19 +106,22 @@ RESULT_DIR = 'results'
 exists(RESULT_DIR) or makedirs(RESULT_DIR)
 
 
-def main():
-    for page in range(1, TOTAL_PAGE + 1):
-        index_html = scrape_index(page)
-        detail_urls = parse_index(index_html)
-        # logging.info('detail urls %s', list(detail_urls))
-        for detail_url in detail_urls:
-            detail_html = scrape_detail(detail_url)
-            data = parse_detail(detail_html)
-            logging.info('get detail data %s', data)
-            logging.info('saving data to json file')
-            save_data(data)
-            logging.info('data saved successfully')
+def main(page):
+    index_html = scrape_index(page)
+    detail_urls = parse_index(index_html)
+    # logging.info('detail urls %s', list(detail_urls))
+    for detail_url in detail_urls:
+        detail_html = scrape_detail(detail_url)
+        data = parse_detail(detail_html)
+        logging.info('get detail data %s', data)
+        logging.info('saving data to json file')
+        save_data(data)
+        logging.info('data saved successfully')
 
 
 if __name__ == '__main__':
-    main()
+    pool = multiprocessing.Pool()
+    pages = range(1, TOTAL_PAGE + 1)
+    pool.map(main, pages)
+    pool.close()
+    pool.join()
