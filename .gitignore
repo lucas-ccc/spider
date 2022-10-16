@@ -1,2 +1,3 @@
 **/results/
-*spider.log
+*.log
+*.txt
