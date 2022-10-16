@@ -58,7 +58,7 @@ def parse_detail(html):
     categories_pattern = re.compile(
         '<button.*?category.*?<span>(.*?)</span>.*?</button>', re.S
     )
-    published_at_pattern = re.compile('(\d{4}-\d{2}-\d{2})\s?上映')
+    published_at_pattern = re.compile(r'(\d{4}-\d{2}-\d{2})\s?上映')
     drama_pattern = re.compile('<div.*?drama.*?>.*?<p.*?>(.*?)</p>', re.S)
     score_pattern = re.compile('<p.*?.score.*?>(.*?)</p>', re.S)
 
@@ -81,8 +81,8 @@ def parse_detail(html):
     return {
         'cover': cover,
         'name': name,
-        'categories': categories,    # bug
-        'published_at': published_at,    # bug
+        'categories': categories,
+        'published_at': published_at,
         'drama': drama,
         'score': score,
     }
